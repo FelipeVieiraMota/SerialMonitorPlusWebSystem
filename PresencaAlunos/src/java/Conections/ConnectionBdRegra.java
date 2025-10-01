@@ -14,24 +14,35 @@ import java.sql.SQLException;
  * @author felipe
  */
 public class ConnectionBdRegra {
-        public static Connection conectarBdRegra(){
-        Connection conn=null;
-        try{
-            if(conn == null){
-                Class.forName("com.mysql.jdbc.Driver");
-                conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/BD_REGRA?"+"user=root&password=felipe@mota#");
-                System.out.println("Conexao com o banco BD_REGRA ok!");
-                return conn;
-            }
-        }catch(SQLException  | ClassNotFoundException exception){
-            System.out.println("Erro na Conexão: ");
-            System.out.println(exception.getCause());            
-        }        
-        return conn;
+    
+        // Adjust to your setup
+    private static final String URL  = "jdbc:postgresql://localhost:5432/master_data";
+    private static final String USER = "root";           // not "root" on Postgres
+    private static final String PASS = "root";       // your real password
+    
+    public static Connection conectarBdRegra(){
+            
+        try {
+            // Load driver (optional on modern JDBC, harmless if present)
+            Class.forName("org.postgresql.Driver");
+
+            Connection conn = DriverManager.getConnection(URL, USER, PASS);
+            System.out.println("Conexão com o banco master_data ok!");
+            return conn;
+
+        } catch (SQLException | ClassNotFoundException e) {
+            // NEVER println(null) on GlassFish logging
+            System.out.println("Erro na Conexão:");
+            System.out.println(e.getMessage());  // safe
+            e.printStackTrace();                 // full context in server log
+            // Don't return null; make failure explicit:
+            throw new IllegalStateException("Falha ao conectar no PostgreSQL: " + URL, e);
+        }
+        
     }  
     public static void main(String args[]){
        Connection conn;       
        conn = ConnectionBDAUTENTICACAO.conectarBDAUTENTICACAO();
-       System.out.println("Conn = "+conn);
+       System.out.println("Conn = " + conn);
     }        
 }

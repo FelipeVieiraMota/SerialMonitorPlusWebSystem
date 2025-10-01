@@ -33,6 +33,7 @@ public class AutenticacaoUsuarioDao {
             ps.setString(1, usuario);
             ps.setString(2, senha);
             ResultSet rs = ps.executeQuery();
+            System.out.println(rs);
             if(rs != null){
                 while(rs.next()){
                     AutenticacaoUsuarioVo autenticacaoUsuarioVo = new AutenticacaoUsuarioVo();
