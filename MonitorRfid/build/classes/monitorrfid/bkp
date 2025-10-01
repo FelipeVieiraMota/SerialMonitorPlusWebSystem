@@ -1,0 +1,144 @@
+CARTÕES : 
+
+1) CHAVEIRO AZUL = 580157217
+2) CT = 129236128
+3) CARTÃO BRANCO = 250118440
+
+
+
+
+    public void regra() throws ParseException {
+        try {
+            //Busca a data atual
+            Locale locale = new Locale("pt", "BR");
+            String dataAtualFormatada = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", locale)
+                    .format(System.currentTimeMillis());
+            //GregorianCalendar gc = new GregorianCalendar();
+            //SimpleDateFormat sdfDiaDaSemana = new SimpleDateFormat();
+            //Seta valores da data
+            String dataString = dataAtualFormatada.substring(0, 10);
+            System.out.println("Data:" + dataString);
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            Date dt = df.parse(dataString);
+            DateFormat df2 = new SimpleDateFormat("EEEE");
+            System.out.println("Dia da Semana == " + df2.format(dt));
+            String diaDaSemana = df2.format(dt);
+            //Seta valores do horário no momento da leitura do cartão
+            String horario = dataAtualFormatada.substring(11, 19);
+            //Dados do arduino
+            String inputLine = input.readLine();// ler os dados do cartao
+            //Divide a String com a metade da sala
+            String sala = inputLine.substring(0, 7);
+            System.out.println("Sala:" + sala);
+            //Divide a String com a metade do cartao
+            String cartaoDoAluno = inputLine.substring(8, 17);//250118440
+            System.out.println("Linha Completa > " + inputLine);
+
+            PesquisarAluno p = new PesquisarAluno();
+            DiaDeAulaDAO dao = new DiaDeAulaDAO();
+
+            ArrayList<AlunoVO> arrayAluno = p.consultarAluno(cartaoDoAluno);
+            ArrayList<DiaDeProvaVO> arrayDiaDeProva = dao.consultarDiaDeProva(sala, dataString);
+            boolean verificar = dao.verificaSeAlunoJaBateuPonto(cartaoDoAluno);
+            if (verificar == false) {
+                if (!arrayAluno.isEmpty() && !arrayDiaDeProva.isEmpty()) {
+                    System.out.println("Os array aluno e dia de prova não estão vazios =)");
+                    SimpleDateFormat regraHora = new SimpleDateFormat("HH:mm", locale);
+                    Date horarioAtual = new Date();
+                    int idAluno = 0;
+                    int idDiaDeProva = 0;
+                    String nomeAluno = "";
+                    String matriculaAluno = "";
+                    String tagRfid = "";
+                    String curso = "";
+                    String abreviacaoTurma = "";
+                    String prova = "vazio";
+                    String data = "vazio";
+                    String pontoDoAluno;
+                    String diaDeAplicacao = "";
+                    boolean status = true;
+                    Date horaInicial = null;
+                    Date horaFinal = null;
+                    pontoDoAluno = horarioAtual.toString();
+                    System.out.println("Hora atual(ponto do aluno): " + pontoDoAluno);
+
+                    for (AlunoVO alunoVo : arrayAluno) {
+                        idAluno = alunoVo.getIdAluno();
+                        curso = alunoVo.getNomeCurso();
+                        abreviacaoTurma = alunoVo.getAbreviacaoTurma();
+                        tagRfid = alunoVo.getCodigoCartaoRfidAluno();
+                        matriculaAluno = alunoVo.getCodigoMatriculaAluno();
+                        nomeAluno = alunoVo.getNomeAluno();
+                        System.out.println("Id Aluno: " + idAluno);
+                    }
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", locale);
+                    Date hora = Calendar.getInstance().getTime(); // Ou qualquer outra forma que tem
+                    String dataFormatada = sdf.format(hora);
+
+                    for (DiaDeProvaVO diaDeProvaVo : arrayDiaDeProva) {
+                        horaInicial = regraHora.parse(diaDeProvaVo.getHorarioInicialDaProva());
+                        horaFinal = regraHora.parse(diaDeProvaVo.getHorarioFinalDaProva());
+                        hora = regraHora.parse(horario);
+                        idDiaDeProva = diaDeProvaVo.getIdDiaDeProva();
+                        prova = diaDeProvaVo.getProva();
+                        data = diaDeProvaVo.getDataDaProva();
+                        diaDeAplicacao = diaDeProvaVo.getDiaDaSemana();
+                        System.out.println("Id dia de Prova: " + idDiaDeProva);
+                        System.out.println("Horario Inicial: " + horaInicial.getTime());
+                        System.out.println("Horario Final : " + horaFinal.getTime());
+                        System.out.println("Horario Atual : " + hora.getTime());
+                        System.out.println("Dia de Aplicacao : " + diaDeAplicacao);
+                    }
+
+                    if (diaDaSemana.equals(diaDeAplicacao)) {
+                        if ((hora.getTime() > horaInicial.getTime()) && (hora.getTime() < horaFinal.getTime())) {
+                            System.out.println("Hora dentro do intervalo");
+                            //FrequenciaAlunoVO freqVo = new FrequenciaAlunoVO( idAluno, idDiaDeProva, status, prova, data, pontoDoAluno);
+                            FrequenciaAlunoDAO freqDao = new FrequenciaAlunoDAO();
+                            boolean statusAluno = freqDao.verificaSeAlunoJaBateuPonto(prova, idAluno);
+                            if (statusAluno == false) {
+                                FrequenciaAlunoVO freqVo = new FrequenciaAlunoVO(
+                                        idAluno,
+                                        idDiaDeProva,
+                                        status,
+                                        prova,
+                                        dataString,
+                                        horario,
+                                        diaDeAplicacao);
+
+                                freqDao.cadastrarFrequenciaDoAluno(freqVo);
+
+                                for (AlunoVO alunoVo : arrayAluno) {
+                                    mn.setTxtConsole("Data: " + dataString
+                                            + "\nHora: " + horario
+                                            + "\nProva: " + prova
+                                            + "\nSala: " + sala
+                                            + "\nCurso: " + curso
+                                            + "\nTurma: " + abreviacaoTurma
+                                            + "\nTag : " + tagRfid
+                                            + "\nCod. Matricula : " + matriculaAluno
+                                            + "\nNome do Aluno: " + nomeAluno
+                                            + "\nPresenca Computada Com Sucesso!");
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Aluno : " + nomeAluno + " já bateu o ponto para a prova " + prova + " na " + sala);
+                            }
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Aluno : " + nomeAluno + " fora do horario ou dia incorreto, favor tentar mais tarde!");
+                    }
+
+                } else {
+                    mn.setTxtConsole("A Tag " + cartaoDoAluno + " não consta nos nossos registros");
+                    JOptionPane.showMessageDialog(null, "A Tag " + cartaoDoAluno + " não consta nos nossos registros");
+                }
+            } else {
+                mn.setTxtConsole("");
+                JOptionPane.showMessageDialog(null, "Já cadastrado para a realização da prova");
+            }
+
+        } catch (IOException e) {
+            System.err.println("Erro de geral: " + e.toString());
+        }
+    }

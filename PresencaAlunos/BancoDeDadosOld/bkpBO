@@ -1,0 +1,105 @@
+    public TurmaVO coletarIdCursoIdSemestreParaCadastrarTurmaBO(TurmaVO turmaVO) {
+        System.out.println("Dentro do metodo coletarIdCursoIdSemestreParaCadastrarTurma =)");
+        TurmaVO retornoObjTurma;
+        ArrayList<CursoVO> arrayCurso;
+        ArrayList<SemestreVO> arraySemestre;
+        int idCurso = 0;
+        int idSemestre = 0;
+        CursoDAO cursodao = new CursoDAO();
+        SemestreDAO semestredao = new SemestreDAO();
+        System.out.println("coletando o curso...");
+        arrayCurso = cursodao.consultarCursoPeloNome(turmaVO.getCurso());
+        System.out.println("curso coletado!!!");
+        System.out.println("coletando o semestre...");
+        arraySemestre = semestredao.consultarSemestrePeloNome(turmaVO.getAnoSemestre());
+        System.out.println("semestre coletado ...");
+        if ((!arrayCurso.isEmpty() && (!arraySemestre.isEmpty()))) {
+            System.out.println("dentro do if =)");
+            for (CursoVO vo : arrayCurso) {
+                if (vo.getNomeCurso().equals(turmaVO.getCurso())) {
+                    idCurso = vo.getIdCurso();
+                    System.out.println("*** idCurso = " + idCurso);
+                }
+            }
+            for (SemestreVO vo : arraySemestre) {
+                if (vo.getSemestre().equals(turmaVO.getAnoSemestre())) {
+                    idSemestre = vo.getIdSemestre();
+                    System.out.println("*** idSemestre = " + idSemestre);
+                }
+            }
+        }
+        retornoObjTurma = new TurmaVO(
+                idSemestre,
+                idCurso,
+                turmaVO.getAnoSemestre(),
+                turmaVO.getCurso(),
+                turmaVO.getNomeTurma(),
+                turmaVO.getAbreviacaoTurma(),
+                turmaVO.getCiclo(),
+                turmaVO.getPeriodo(),
+                turmaVO.getCodigoTurma(),
+                turmaVO.getObservacoes());
+
+        return retornoObjTurma;
+    }
+
+
+
+    public boolean consultarObjetoTurmaPeloIdTurmaIdCursoIdSemestreBO(int idTurma, int idCurso, int idSemestre) {
+        boolean status = false;
+        ArrayList<TurmaVO> arrayTurma;
+        TurmaDAO dao = new TurmaDAO();
+        arrayTurma = dao.consultarObjetoTurmaPeloIdTurmaIdCursoIdSemestreDAO(idTurma, idSemestre, idCurso);
+        if (!arrayTurma.isEmpty()) {
+            for (TurmaVO vo : arrayTurma) {
+                if ((vo.getIdTurma() == idTurma) && (vo.getIdSemestre() == idSemestre) && (vo.getIdCurso() == idCurso)) {
+                    status = true;
+                    return status;
+                }
+            }
+        } else {
+            System.out.println("=( dentro do else do metodo pesquisarIdTurmaEmRelacaoAoCurso, pelo visto turmaArrya está vazia...");
+        }
+        return status;
+    }
+
+    /*public boolean alterarTurmaBO(TurmaVO turmaVO) {
+        boolean status = false;
+        ArrayList<TurmaVO> arrayTurma;
+        arrayTurma = pesquisarObjetoTurma(turmaVO.getNomeTurma());
+        if (!arrayTurma.isEmpty()) {
+            for (TurmaVO vo : arrayTurma) {
+                System.out.println("********************************");
+                System.out.println("ID DA TURMA = " + vo.getIdTurma());
+                System.out.println("********************************");
+                if (vo.getNomeTurma().equals(turmaVO.getNomeTurma())) {
+                    int idTurma = vo.getIdTurma();
+                    int idCurso = vo.getIdCurso();
+                    TurmaVO turmaOk = new TurmaVO(
+                            idCurso,
+                            turmaVO.getAnoSemestre(),
+                            idTurma,
+                            turmaVO.getCurso(),
+                            turmaVO.getNomeTurma(),
+                            turmaVO.getAbreviacaoTurma(),
+                            turmaVO.getCiclo(),
+                            turmaVO.getPeriodo(),
+                            turmaVO.getCodigoTurma(),
+                            turmaVO.getObservacoes());
+                    TurmaDAO dao;
+                    dao = new TurmaDAO();
+                    boolean retorno = dao.alterarTurma(turmaOk);
+                    status = retorno;
+                    return status;
+                }
+            }
+        }
+        return status;
+    }*/
+
+
+
+
+
+
+

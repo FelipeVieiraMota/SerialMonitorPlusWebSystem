@@ -1,0 +1,13 @@
+
+1) Aluno :
+
+
+* pesquisar o aluno na tabela aluno;
+* pesquisar em qual turma o aluno se encontra;  
+
+    SELECT * FROM ALUNO_TURMA ALT, ALUNO A, TURMA T
+    WHERE A.CODIGO_CARTAO_RFID = ALT.CODIGO_CARTAO_RFID
+        AND T.ID_TURMA = ALT.ID_TURMA;
+ 
+* VERIFICAR DIA DA SEMANA;
+* PESQ          

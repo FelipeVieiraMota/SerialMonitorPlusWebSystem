@@ -1,0 +1,102 @@
+
+    public final String CONSULTAR_TABELA_TURMA_CURSO_ANO_SEMESTRE_ANO_SEMESTRE_TURMA
+            = " SELECT * FROM TURMA T, CURSO C, ANO_SEMESTRE ANSM, ANO_SEMESTRE_TURMA ANSMT "
+            + " WHERE "
+            + " ANSMT.ID_TURMA = ? " /*T.ID_TURMA*/
+            + " AND "
+            + " ANSMT.ID_ANO_SEMESTRE = ? " /*ANSM.ID_ANO_SEMESTRE*/
+            + " AND "
+            + " C.ID_CURSO = ? " /* T.ID_CURSO*/
+            + " ORDER BY T.ID_TURMA;";
+
+    public final String JOIN_TURMA_CURSO_ANO_SEMESTRE
+            = "SELECT * FROM TURMA T, ANO_SEMESTRE ANS ,ANO_SEMESTRE_TURMA ANST, CURSO C\n"
+            + "    WHERE \n"
+            + "        T.ID_TURMA = ANST.ID_TURMA\n"
+            + "    AND \n"
+            + "        ANS.ID_ANO_SEMESTRE = ANST.ID_ANO_SEMESTRE\n"
+            + "    AND \n"
+            + "        C.ID_CURSO = T.ID_CURSO"
+            + "    AND"
+            + "        T.NOME_TURMA = ?;";
+
+    public final String CONSULTAR_TODAS_TURMAS_CURSO_SEMESTRE
+            = "SELECT * FROM TURMA T, ANO_SEMESTRE ANS ,ANO_SEMESTRE_TURMA ANST, CURSO C\n"
+            + "    WHERE \n"
+            + "        T.ID_TURMA = ANST.ID_TURMA\n"
+            + "    AND \n"
+            + "        ANS.ID_ANO_SEMESTRE = ANST.ID_ANO_SEMESTRE\n"
+            + "    AND \n"
+            + "        C.ID_CURSO = T.ID_CURSO"
+            + " ORDER BY T.NOME_TURMA;";
+
+    public final String CADASTRAR_TURMA_EM_RELACAO_AO_CURSO
+            = "  INSERT INTO TURMA( "
+            + "  ID_CURSO "
+            + " ,NOME_TURMA "
+            + " ,ABREVIACAO_TURMA "
+            + " ,CICLO "
+            + " ,PERIODO "
+            + " ,OBSERVACOES) "
+            + "  VALUES(?,?,?,?,?,?); ";
+
+    public final String CADASTRAR_TURMA_EM_RELACAO_AO_SEMESTRE
+            = "  INSERT INTO ANO_SEMESTRE_TURMA( "
+            + "  ID_ANO_SEMESTRE "
+            + " ,ID_TURMA "
+            + " ,OBSERVACOES) "
+            + "  VALUES(?,?,?); ";
+
+    public final String ALTERAR_TURMA_EM_RELACAO_AO_CURSO
+            = "  UPDATE TURMA SET "
+            + "  ID_CURSO = ?"
+            + "  NOME_TURMA = ? "
+            + " ,ABREVIACAO = ? "
+            + " ,CICLO = ? "
+            + " ,PERIODO = ? "
+            + " ,OBSERVACOES = ? "
+            + "  WHERE ID_TURMA = ?";    
+
+
+
+public ArrayList<TurmaVO> consultarObjetoTurmaPeloIdTurmaIdCursoIdSemestreDAO(int idTurma, int idSemestre, int idCurso) {
+        System.out.println("Dentro do Metodo DAO consultarTurma ...");
+        System.out.println("*** ID Turma Digitada = " + idTurma + " ***");
+        ArrayList<TurmaVO> turmaArray = new ArrayList();
+        try {
+            PreparedStatement ps = ConnectionBdRegra.conectarBdRegra().prepareStatement(CONSULTAR_TABELA_TURMA_CURSO_ANO_SEMESTRE_ANO_SEMESTRE_TURMA);
+            ps.setInt(1, idTurma);
+            ps.setInt(2, idSemestre);
+            ps.setInt(3, idCurso);
+            /*ps.setString(2,"%"+nomeAluno+"%");*/
+            ResultSet rs = ps.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    System.out.println("Dentro do laço while!!!!");
+                    TurmaVO turmaVO = new TurmaVO();
+                    turmaVO.setIdTurma(rs.getInt("ID_TURMA"));
+                    turmaVO.setIdCurso(rs.getInt("ID_CURSO"));
+                    turmaVO.setNomeTurma(rs.getString("NOME_TURMA"));
+                    turmaVO.setAbreviacaoTurma(rs.getString("ABREVIACAO_TURMA"));
+                    turmaVO.setCiclo(rs.getString("CICLO"));
+                    turmaVO.setPeriodo(rs.getString("PERIODO"));
+                    turmaVO.setCodigoTurma(rs.getString("CODIGO_TURMA"));
+                    turmaVO.setObservacoes(rs.getString("OBSERVACOES"));
+                    turmaArray.add(turmaVO);
+                }
+                ps.close();
+            } else {
+                System.out.println("rs está null");
+            }
+        } catch (SQLException e) {
+            int code = e.getErrorCode();
+            String msg = e.getMessage();
+            System.out.println("Erro code Nº: " + code + "/n" + "ErrorMSG: " + msg);
+        }
+        return turmaArray;
+    }
+
+
+
+*/
+
